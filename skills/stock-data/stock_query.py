@@ -27,29 +27,38 @@ def http_get(url: str, headers: dict = None, timeout: int = 10) -> str:
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
         "Accept": "*/*",
         "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
-        "Accept-Charset": "GBK,utf-8;q=0.7,*;q=0.3",
+        "Accept-Charset": "UTF-8,*;q=0.5",
     }
     if headers:
         default_headers.update(headers)
     
     if HAS_REQUESTS:
         resp = requests.get(url, headers=default_headers, timeout=timeout)
-        # 尝试多种编码
-        for encoding in ['gbk', 'gb2312', 'utf-8']:
-            try:
-                resp.encoding = encoding
-                text = resp.text
-                # 检查是否有乱码
-                if '�' not in text or encoding == 'utf-8':
-                    return text
-            except:
-                continue
-        return resp.text
+        # 东方财富API返回UTF-8，新浪/腾讯可能返回GBK
+        # 根据URL判断编码
+        if 'eastmoney' in url:
+            resp.encoding = 'utf-8'
+            return resp.text
+        else:
+            # 新浪/腾讯可能用GBK
+            for encoding in ['gbk', 'gb2312', 'utf-8']:
+                try:
+                    resp.encoding = encoding
+                    text = resp.text
+                    # 检查是否有乱码
+                    if '�' not in text or encoding == 'utf-8':
+                        return text
+                except:
+                    continue
+            return resp.text
     else:
         req = urllib.request.Request(url, headers=default_headers)
         with urllib.request.urlopen(req, timeout=timeout) as response:
             content = response.read()
-            # 尝试多种编码
+            # 东方财富API返回UTF-8
+            if 'eastmoney' in url:
+                return content.decode('utf-8')
+            # 其他尝试多种编码
             for encoding in ['gbk', 'gb2312', 'utf-8']:
                 try:
                     return content.decode(encoding)
@@ -181,6 +190,129 @@ def get_tencent_hk_quote(symbol: str) -> dict:
         return {"error": str(e), "symbol": symbol}
 
 
+def get_eastmoney_hk_quote(symbol: str) -> dict:
+    """使用东方财富获取港股实时行情"""
+    try:
+        hk_symbol = symbol.zfill(5)
+        # 东方财富港股 secid: 116 为港股市场
+        secid = f"116.{hk_symbol}"
+        
+        url = f"https://push2.eastmoney.com/api/qt/stock/get?secid={secid}&fields=f43,f44,f45,f46,f47,f48,f50,f51,f52,f55,f57,f58,f60,f116,f117,f162,f167,f170,f173,f105"
+        
+        text = http_get(url)
+        data = json.loads(text)
+        
+        if not data.get("data"):
+            return {"error": "东方财富数据获取失败", "symbol": symbol}
+        
+        d = data["data"]
+        
+        return {
+            "symbol": symbol,
+            "name": d.get("f58", ""),
+            "price": d.get("f43", 0) / 100 if d.get("f43") else 0,
+            "high": d.get("f44", 0) / 100 if d.get("f44") else 0,
+            "low": d.get("f45", 0) / 100 if d.get("f45") else 0,
+            "open": d.get("f46", 0) / 100 if d.get("f46") else 0,
+            "volume": d.get("f47", 0),
+            "amount": d.get("f48", 0),
+            "change": d.get("f50", 0) / 100 if d.get("f50") else 0,
+            "change_pct": d.get("f51", 0) / 100 if d.get("f51") else 0,
+            "prev_close": d.get("f60", 0) / 100 if d.get("f60") else 0,
+            "market_cap": d.get("f116", 0),
+            "circulating_cap": d.get("f117", 0),
+            "pe_ratio": d.get("f170", 0) / 100 if d.get("f170") else 0,
+            "pb_ratio": d.get("f167", 0) / 100 if d.get("f167") else 0,
+            "52week_high": d.get("f173", 0) / 100 if d.get("f173") else 0,
+            "52week_low": d.get("f105", 0) / 100 if d.get("f105") else 0,
+            "market": "港股",
+            "source": "东方财富",
+            "timestamp": datetime.now().isoformat()
+        }
+    except Exception as e:
+        return {"error": str(e), "symbol": symbol}
+
+
+def get_eastmoney_hk_history(symbol: str, days: int = 30) -> dict:
+    """使用东方财富获取港股历史K线数据"""
+    try:
+        hk_symbol = symbol.zfill(5)
+        # 东方财富港股 secid: 116 为港股市场
+        secid = f"116.{hk_symbol}"
+        
+        # klt: 101=日K, 102=周K, 103=月K
+        url = f"https://push2his.eastmoney.com/api/qt/stock/kline/get?secid={secid}&fields1=f1,f2,f3,f4,f5,f6&fields2=f51,f52,f53,f54,f55,f56,f57&klt=101&fqt=1&end=20500101&lmt={days}"
+        
+        text = http_get(url)
+        data = json.loads(text)
+        
+        if not data.get("data") or not data["data"].get("klines"):
+            return {"error": "港股历史数据获取失败", "symbol": symbol}
+        
+        klines = data["data"]["klines"]
+        records = []
+        
+        for line in klines:
+            parts = line.split(',')
+            records.append({
+                "date": parts[0],
+                "open": float(parts[1]),
+                "close": float(parts[2]),
+                "high": float(parts[3]),
+                "low": float(parts[4]),
+                "volume": int(float(parts[5])),
+                "amount": float(parts[6])
+            })
+        
+        return {
+            "symbol": symbol,
+            "name": data["data"].get("name", ""),
+            "period": "daily",
+            "days": len(records),
+            "data": records,
+            "source": "东方财富",
+            "timestamp": datetime.now().isoformat()
+        }
+    except Exception as e:
+        return {"error": str(e), "symbol": symbol}
+
+
+def get_eastmoney_hk_info(symbol: str) -> dict:
+    """使用东方财富获取港股基本信息"""
+    try:
+        hk_symbol = symbol.zfill(5)
+        secid = f"116.{hk_symbol}"
+        
+        url = f"https://push2.eastmoney.com/api/qt/stock/get?secid={secid}&fields=f57,f58,f84,f85,f116,f117,f162,f167,f173,f105,f187,f190"
+        
+        text = http_get(url)
+        data = json.loads(text)
+        
+        if not data.get("data"):
+            return {"error": "港股信息获取失败", "symbol": symbol}
+        
+        d = data["data"]
+        
+        return {
+            "symbol": symbol,
+            "name": d.get("f58", ""),
+            "market_cap": d.get("f116", 0),
+            "circulating_cap": d.get("f117", 0),
+            "total_shares": d.get("f84", 0),
+            "circulating_shares": d.get("f85", 0),
+            "pe_ratio": d.get("f162", 0) / 100 if d.get("f162") else 0,
+            "pb_ratio": d.get("f167", 0) / 100 if d.get("f167") else 0,
+            "dividend_yield": d.get("f187", 0) / 100 if d.get("f187") else 0,
+            "52week_high": d.get("f173", 0) / 100 if d.get("f173") else 0,
+            "52week_low": d.get("f105", 0) / 100 if d.get("f105") else 0,
+            "market": "港股",
+            "source": "东方财富",
+            "timestamp": datetime.now().isoformat()
+        }
+    except Exception as e:
+        return {"error": str(e), "symbol": symbol}
+
+
 def get_eastmoney_quote(symbol: str) -> dict:
     """使用东方财富获取A股实时行情"""
     try:
@@ -305,6 +437,60 @@ def get_stock_info_eastmoney(symbol: str) -> dict:
         return {"error": str(e), "symbol": symbol}
 
 
+def detect_market(symbol: str) -> str:
+    """自动识别股票所属市场"""
+    symbol = symbol.strip().upper()
+    
+    # 港股特征：
+    # 1. 5位数字，以0开头（如00700, 03690, 09988）
+    # 2. 常见港股代码范围
+    if re.match(r'^0\d{4}$', symbol):
+        return "hk"
+    
+    # A股特征：
+    # 1. 6位数字
+    # 2. 沪市以6开头，深市以0/3开头
+    if re.match(r'^[036]\d{5}$', symbol):
+        return "cn"
+    
+    # 美股特征：字母
+    if re.match(r'^[A-Z]+$', symbol):
+        return "us"
+    
+    # 默认A股
+    return "cn"
+
+
+def normalize_symbol(symbol: str, market: str = None) -> tuple:
+    """规范化股票代码，返回 (symbol, market)"""
+    symbol = symbol.strip()
+    
+    # 移除常见前缀
+    prefixes_to_remove = ['SH', 'SZ', 'HK', 'sh', 'sz', 'hk']
+    for prefix in prefixes_to_remove:
+        if symbol.upper().startswith(prefix):
+            symbol = symbol[len(prefix):]
+            if prefix.upper() == 'HK':
+                market = 'hk'
+            break
+    
+    # 移除后缀（如 .HK, .SH, .SZ）
+    if '.' in symbol:
+        parts = symbol.split('.')
+        symbol = parts[0]
+        suffix = parts[1].upper()
+        if suffix == 'HK':
+            market = 'hk'
+        elif suffix in ['SH', 'SZ']:
+            market = 'cn'
+    
+    # 如果未指定市场，自动检测
+    if not market:
+        market = detect_market(symbol)
+    
+    return symbol, market
+
+
 def get_sector_data() -> dict:
     """获取板块行情"""
     try:
@@ -345,8 +531,11 @@ def get_realtime_quote(symbol: str, market: str = "cn") -> dict:
         # 回退到新浪
         return get_realtime_quote_sina(symbol, market)
     elif market == "hk":
-        # 港股使用腾讯接口
-        return get_tencent_hk_quote(symbol)
+        # 港股优先使用腾讯接口（更稳定），失败则尝试东方财富
+        result = get_tencent_hk_quote(symbol)
+        if "error" not in result:
+            return result
+        return get_eastmoney_hk_quote(symbol)
     else:
         # 美股使用新浪接口
         return get_realtime_quote_sina(symbol, market)
@@ -354,25 +543,31 @@ def get_realtime_quote(symbol: str, market: str = "cn") -> dict:
 
 def get_history_data(symbol: str, market: str = "cn", period: str = "daily", days: int = 30) -> dict:
     """获取历史K线数据"""
-    if market != "cn":
-        return {"error": "暂只支持A股历史数据", "symbol": symbol}
-    return get_history_data_eastmoney(symbol, days)
+    if market == "cn":
+        return get_history_data_eastmoney(symbol, days)
+    elif market == "hk":
+        return get_eastmoney_hk_history(symbol, days)
+    else:
+        return {"error": "暂只支持A股和港股历史数据", "symbol": symbol}
 
 
 def get_stock_info(symbol: str, market: str = "cn") -> dict:
     """获取股票详细信息"""
-    if market != "cn":
-        return {"error": "暂只支持A股详细信息", "symbol": symbol}
-    return get_stock_info_eastmoney(symbol)
+    if market == "cn":
+        return get_stock_info_eastmoney(symbol)
+    elif market == "hk":
+        return get_eastmoney_hk_info(symbol)
+    else:
+        return {"error": "暂只支持A股和港股详细信息", "symbol": symbol}
 
 
 def main():
     parser = argparse.ArgumentParser(description="股票数据查询工具")
     parser.add_argument("--type", choices=["realtime", "history", "info", "sector"],
                         default="realtime", help="查询类型")
-    parser.add_argument("--symbol", help="股票代码")
-    parser.add_argument("--market", choices=["cn", "hk", "us"], default="cn",
-                        help="市场: cn(A股), hk(港股), us(美股)")
+    parser.add_argument("--symbol", help="股票代码（支持自动识别市场）")
+    parser.add_argument("--market", choices=["cn", "hk", "us", "auto"], default="auto",
+                        help="市场: cn(A股), hk(港股), us(美股), auto(自动识别)")
     parser.add_argument("--period", choices=["daily", "weekly", "monthly"],
                         default="daily", help="K线周期 (目前仅支持 daily)")
     parser.add_argument("--days", type=int, default=30, help="历史天数")
@@ -385,12 +580,21 @@ def main():
     
     result = {}
     
+    # 处理股票代码和市场
+    symbol = args.symbol
+    market = args.market
+    
+    if symbol and market == "auto":
+        symbol, market = normalize_symbol(symbol)
+    elif symbol:
+        symbol, _ = normalize_symbol(symbol, market)
+    
     if args.type == "realtime":
-        result = get_realtime_quote(args.symbol, args.market)
+        result = get_realtime_quote(symbol, market)
     elif args.type == "history":
-        result = get_history_data(args.symbol, args.market, args.period, args.days)
+        result = get_history_data(symbol, market, args.period, args.days)
     elif args.type == "info":
-        result = get_stock_info(args.symbol, args.market)
+        result = get_stock_info(symbol, market)
     elif args.type == "sector":
         result = get_sector_data()
     
