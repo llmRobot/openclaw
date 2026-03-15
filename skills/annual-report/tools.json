@@ -1,0 +1,246 @@
+{
+  "openclaw": {
+    "tools": [
+      {
+        "name": "download_annual_report",
+        "description": "下载上市公司年报PDF文件。从上交所、巨潮资讯、东方财富等渠道获取年报，保存到本地。",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "symbol": {
+              "type": "string",
+              "description": "股票代码，如 600519"
+            },
+            "year": {
+              "type": "integer",
+              "description": "年报年份，如 2023"
+            }
+          },
+          "required": ["symbol", "year"]
+        }
+      },
+      {
+        "name": "import_local_pdf",
+        "description": "导入本地PDF年报文件。当自动下载失败时，可以手动下载后导入。",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "local_path": {
+              "type": "string",
+              "description": "本地PDF文件路径"
+            },
+            "symbol": {
+              "type": "string",
+              "description": "股票代码"
+            },
+            "year": {
+              "type": "integer",
+              "description": "年报年份"
+            }
+          },
+          "required": ["local_path", "symbol", "year"]
+        }
+      },
+      {
+        "name": "list_local_reports",
+        "description": "列出本地已下载的年报文件。",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "symbol": {
+              "type": "string",
+              "description": "股票代码（可选，不填则列出所有）"
+            }
+          },
+          "required": []
+        }
+      },
+      {
+        "name": "parse_income_statement",
+        "description": "解析利润表。提取营收、毛利、净利润、EPS 等关键指标。",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "symbol": {
+              "type": "string",
+              "description": "股票代码"
+            },
+            "year": {
+              "type": "integer",
+              "description": "年报年份"
+            }
+          },
+          "required": ["symbol", "year"]
+        }
+      },
+      {
+        "name": "parse_balance_sheet",
+        "description": "解析资产负债表。提取资产、负债、股东权益等结构数据。",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "symbol": {
+              "type": "string",
+              "description": "股票代码"
+            },
+            "year": {
+              "type": "integer",
+              "description": "年报年份"
+            }
+          },
+          "required": ["symbol", "year"]
+        }
+      },
+      {
+        "name": "parse_cash_flow_statement",
+        "description": "解析现金流量表。提取经营、投资、筹资活动现金流数据。",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "symbol": {
+              "type": "string",
+              "description": "股票代码"
+            },
+            "year": {
+              "type": "integer",
+              "description": "年报年份"
+            }
+          },
+          "required": ["symbol", "year"]
+        }
+      },
+      {
+        "name": "calculate_financial_indicators",
+        "description": "计算核心财务指标。包括盈利能力（ROE、ROA、毛利率）、偿债能力（资产负债率、流动比率）、成长能力等。",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "symbol": {
+              "type": "string",
+              "description": "股票代码"
+            },
+            "year": {
+              "type": "integer",
+              "description": "年报年份"
+            }
+          },
+          "required": ["symbol", "year"]
+        }
+      },
+      {
+        "name": "extract_mda_section",
+        "description": "提取管理层讨论与分析(MD&A)章节。获取管理层对公司经营情况的分析和展望。",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "symbol": {
+              "type": "string",
+              "description": "股票代码"
+            },
+            "year": {
+              "type": "integer",
+              "description": "年报年份"
+            }
+          },
+          "required": ["symbol", "year"]
+        }
+      },
+      {
+        "name": "detect_audit_opinion",
+        "description": "识别审计意见类型。判断是标准无保留意见、保留意见、否定意见等。",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "symbol": {
+              "type": "string",
+              "description": "股票代码"
+            },
+            "year": {
+              "type": "integer",
+              "description": "年报年份"
+            }
+          },
+          "required": ["symbol", "year"]
+        }
+      },
+      {
+        "name": "extract_risk_disclosures",
+        "description": "提取风险披露信息。包括诉讼风险、关联交易披露等。",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "symbol": {
+              "type": "string",
+              "description": "股票代码"
+            },
+            "year": {
+              "type": "integer",
+              "description": "年报年份"
+            }
+          },
+          "required": ["symbol", "year"]
+        }
+      },
+      {
+        "name": "detect_financial_anomalies",
+        "description": "财务异常检测。识别财务造假风险信号、现金流异常、偿债风险等预警。",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "symbol": {
+              "type": "string",
+              "description": "股票代码"
+            },
+            "years": {
+              "type": "string",
+              "description": "多个年份，逗号分隔，如 2021,2022,2023"
+            }
+          },
+          "required": ["symbol", "years"]
+        }
+      },
+      {
+        "name": "compare_annual_reports",
+        "description": "多年对比分析。对比多个年度的财务数据，发现趋势变化。",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "symbol": {
+              "type": "string",
+              "description": "股票代码"
+            },
+            "years": {
+              "type": "string",
+              "description": "多个年份，逗号分隔，如 2021,2022,2023"
+            }
+          },
+          "required": ["symbol", "years"]
+        }
+      },
+      {
+        "name": "generate_full_report",
+        "description": "生成完整年报分析报告。包含下载、解析、分析、异常检测全流程。",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "symbol": {
+              "type": "string",
+              "description": "股票代码"
+            },
+            "year": {
+              "type": "integer",
+              "description": "年报年份"
+            },
+            "output_format": {
+              "type": "string",
+              "enum": ["json", "markdown"],
+              "default": "json",
+              "description": "输出格式"
+            }
+          },
+          "required": ["symbol", "year"]
+        }
+      }
+    ]
+  }
+}

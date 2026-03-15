@@ -1,0 +1,46 @@
+{
+  "skills": [
+    {
+      "name": "discover_new_skills",
+      "description": "发现 OpenClaw 新增的技能",
+      "parameters": {
+        "type": "object",
+        "properties": {}
+      },
+      "command": "python3 /skills/skill-discovery/scripts/discover_skills.py --type new"
+    },
+    {
+      "name": "get_recommended_skills",
+      "description": "获取推荐的精选技能列表",
+      "parameters": {
+        "type": "object",
+        "properties": {}
+      },
+      "command": "python3 /skills/skill-discovery/scripts/discover_skills.py --type recommend"
+    },
+    {
+      "name": "get_trending_skills",
+      "description": "获取热门技能列表（按安装量排序）",
+      "parameters": {
+        "type": "object",
+        "properties": {}
+      },
+      "command": "python3 /skills/skill-discovery/scripts/discover_skills.py --type trending"
+    },
+    {
+      "name": "get_daily_skill_report",
+      "description": "获取每日技能推荐报告",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "format": {
+            "type": "string",
+            "description": "输出格式: json 或 markdown",
+            "default": "markdown"
+          }
+        }
+      },
+      "command": "python3 /skills/skill-discovery/scripts/discover_skills.py --type report --format ${format}"
+    }
+  ]
+}
