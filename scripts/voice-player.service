@@ -1,0 +1,15 @@
+[Unit]
+Description=Voice Player Service for OpenClaw
+Documentation=https://openclaw.ai
+After=network.target sound.target
+
+[Service]
+Type=simple
+User=%u
+ExecStart=%h/agi/openclaw/scripts/voice-player.sh
+Restart=on-failure
+RestartSec=5
+Environment=VOICE_DIR=%h/.openclaw/workspace/voice-output
+
+[Install]
+WantedBy=default.target
