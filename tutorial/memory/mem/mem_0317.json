@@ -1,0 +1,467 @@
+{
+  "exportDate": "2026-03-17",
+  "exportTime": "2026-03-17T12:50:00+08:00",
+  "version": "2.0",
+  "summary": "OpenClaw 工作记忆导出 - 用于切换账号后恢复上下文",
+  
+  "userInfo": {
+    "feishuUserId": "ou_ab6b6751942b12c4633bba2ae78471e8",
+    "sessionId": "agent:main:feishu:direct:ou_ab6b6751942b12c4633bba2ae78471e8",
+    "sessionFile": "9e0a2ac2-04c9-41a2-a638-49bd04658322.jsonl",
+    "chatId": "oc_251171914f00d0d8798f5262b11f09ea",
+    "chatType": "p2p"
+  },
+  
+  "modelConfig": {
+    "primary": "scnet/MiniMax-M2.5-ZD",
+    "primaryAlias": "MiniMax-ZD",
+    "providers": {
+      "scnet": {
+        "baseUrl": "https://api.scnet.cn/api/llm/v1",
+        "apiKey": "sk-Mzc1LTExODMwMzk0NDc4LTE3NzM0NTEwMjU2MzU=",
+        "api": "openai-completions",
+        "status": "active",
+        "lastTestTime": "2026-03-17T12:40:00+08:00",
+        "responseTime": "3.7s",
+        "models": [
+          {
+            "id": "MiniMax-M2.5",
+            "name": "MiniMax M2.5",
+            "alias": "MiniMax",
+            "reasoning": false,
+            "input": ["text"],
+            "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 },
+            "contextWindow": 128000,
+            "maxTokens": 4096,
+            "status": "available"
+          },
+          {
+            "id": "MiniMax-M2.5-ZD",
+            "name": "MiniMax M2.5 ZD",
+            "alias": "MiniMax-ZD",
+            "reasoning": false,
+            "input": ["text"],
+            "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 },
+            "contextWindow": 128000,
+            "maxTokens": 4096,
+            "status": "available",
+            "isPrimary": true
+          },
+          {
+            "id": "Qwen3-235B-A22B",
+            "name": "Qwen3 235B A22B",
+            "alias": "Qwen3",
+            "reasoning": false,
+            "input": ["text"],
+            "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 },
+            "contextWindow": 32768,
+            "maxTokens": 8192,
+            "status": "available",
+            "warning": "配置文件中 contextWindow 写的是 128000，但实际 API 限制是 32768 tokens"
+          }
+        ]
+      },
+      "pucode": {
+        "baseUrl": "https://api.pucode.com/v1",
+        "apiKey": "sk-IP7MVBKIKZmBX9ft4oDsW6kCL3orM92dwU31604AILyHxHhP",
+        "api": "openai-completions",
+        "status": "unavailable",
+        "lastTestTime": "2026-03-17T12:40:00+08:00",
+        "error": {
+          "code": "model_not_found",
+          "message": "No available channel for model claude-opus-4-6 under group Claude Anti (distributor)",
+          "requestId": "2026031712402061583249139UvwmTb"
+        },
+        "models": [
+          {
+            "id": "claude-opus-4-6",
+            "name": "Claude Opus 4.6",
+            "alias": "Claude",
+            "reasoning": false,
+            "input": ["text", "image"],
+            "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 },
+            "contextWindow": 200000,
+            "maxTokens": 8192,
+            "status": "unavailable"
+          }
+        ]
+      },
+      "moonshot": {
+        "note": "已配置但未测试",
+        "profile": "moonshot:default"
+      }
+    }
+  },
+  
+  "agentConfig": {
+    "agentId": "main",
+    "workspace": "/home/node/.openclaw/workspace",
+    "compaction": {
+      "mode": "safeguard"
+    },
+    "bindings": [
+      {
+        "agentId": "main",
+        "match": { "channel": "feishu" }
+      }
+    ],
+    "commands": {
+      "native": "auto",
+      "nativeSkills": "auto",
+      "restart": true,
+      "ownerDisplay": "raw"
+    },
+    "session": {
+      "dmScope": "per-channel-peer"
+    }
+  },
+  
+  "toolsConfig": {
+    "profile": "full",
+    "feishuTools": [
+      "feishu_doc",
+      "feishu_app_scopes",
+      "feishu_chat",
+      "feishu_wiki",
+      "feishu_drive",
+      "feishu_bitable",
+      "feishu_calendar_calendar",
+      "feishu_calendar_event",
+      "feishu_calendar_event_attendee",
+      "feishu_calendar_freebusy",
+      "feishu_sheet",
+      "feishu_im_bot_image",
+      "feishu_fetch_doc",
+      "feishu_create_doc",
+      "feishu_update_doc",
+      "feishu_oauth",
+      "feishu_oauth_batch_auth"
+    ]
+  },
+  
+  "feishuConfig": {
+    "enabled": true,
+    "dmPolicy": "open",
+    "groupPolicy": "open",
+    "allowFrom": ["*"],
+    "connectionMode": "websocket",
+    "accounts": {
+      "default": {
+        "appId": "cli_a93e78d9bbb85bc8",
+        "appSecret": "my7miwrtnVoBMZmUQtxehdCNpBzgD8m8",
+        "botName": "AI 助手",
+        "tools": {
+          "chat": true
+        }
+      }
+    },
+    "botInfo": {
+      "openId": "ou_fc5afbca318d1a63a336c4b0c70d7f27"
+    },
+    "deduplication": {
+      "warmupEntries": 16
+    }
+  },
+  
+  "gatewayConfig": {
+    "port": 18789,
+    "browserPort": 18790,
+    "mode": "local",
+    "bind": "lan",
+    "controlUi": {
+      "allowedOrigins": [
+        "http://127.0.0.1:18789",
+        "http://localhost:18789"
+      ]
+    },
+    "auth": {
+      "mode": "token",
+      "token": "5eeabb3a3035d95e767c47ade4b9c5f49bfa9dea1cf61da0e63735e687a95380"
+    },
+    "tailscale": {
+      "mode": "off",
+      "resetOnExit": false
+    },
+    "nodes": {
+      "denyCommands": [
+        "camera.snap",
+        "camera.clip",
+        "screen.record",
+        "contacts.add",
+        "calendar.add",
+        "reminders.add",
+        "sms.send"
+      ]
+    },
+    "canvas": {
+      "hostPath": "/home/node/.openclaw/canvas",
+      "mountPoint": "http://0.0.0.0:18789/__openclaw__/canvas/"
+    }
+  },
+  
+  "dockerConfig": {
+    "containerName": "openclaw-openclaw-gateway-1",
+    "serviceName": "openclaw-gateway",
+    "image": "ghcr.io/openclaw/openclaw:latest",
+    "ports": {
+      "gateway": "18789",
+      "browser": "18790"
+    },
+    "status": "healthy",
+    "created": "2 days ago",
+    "composeFile": "/home/robot/agi/openclaw/docker-compose.yml"
+  },
+  
+  "resolvedIssues": [
+    {
+      "id": 1,
+      "date": "2026-03-16T22:37:00+08:00",
+      "issue": "工具名称冲突",
+      "severity": "warning",
+      "symptom": "plugin tool name conflict (openclaw-lark): feishu_chat",
+      "rootCause": "外部插件 openclaw-lark (@larksuite/openclaw-lark v2026.3.12) 与内置 feishu 插件都注册了同名工具 feishu_chat",
+      "diagnosis": "通过 search_content 搜索 feishu_chat 发现两个来源：1) extensions/feishu/src/chat.ts (内置) 2) /home/robot/agi/CLAW_DATA/config/extensions/openclaw-lark/src/tools/oapi/chat/chat.js (外部)",
+      "solution": "删除外部插件 openclaw-lark",
+      "filesModified": [
+        {
+          "path": "/home/robot/agi/CLAW_DATA/config/openclaw.json",
+          "action": "移除 plugins.installs.openclaw-lark 配置项"
+        },
+        {
+          "path": "/home/robot/agi/CLAW_DATA/config/extensions/openclaw-lark",
+          "action": "删除整个目录"
+        }
+      ],
+      "result": "重启后无冲突警告"
+    },
+    {
+      "id": 2,
+      "date": "2026-03-16T22:41:00+08:00",
+      "issue": "Context Overflow (上下文溢出)",
+      "severity": "critical",
+      "symptom": "消息被 dispatching 到 agent 后无响应，无回复",
+      "rootCause": "会话历史文件累积到 118870 tokens (110678 消息 + 8192 输出)，但模型 Qwen3-235B-A22B 实际上下文限制只有 32768 tokens",
+      "errorMessage": "400 This model's maximum context length is 32768 tokens. However, you requested 118870 tokens",
+      "diagnosis": "检查会话文件 /home/node/.openclaw/agents/main/sessions/9e0a2ac2-04c9-41a2-a638-49bd04658322.jsonl 发现大量股票分析报告内容",
+      "solution": "删除问题会话文件并重启 gateway",
+      "filesDeleted": [
+        "/home/node/.openclaw/agents/main/sessions/9e0a2ac2-04c9-41a2-a638-49bd04658322.jsonl",
+        "/home/node/.openclaw/agents/main/sessions/9e0a2ac2-04c9-41a2-a638-49bd04658322.jsonl.lock"
+      ],
+      "commands": [
+        "docker exec openclaw-openclaw-gateway-1 rm -f /home/node/.openclaw/agents/main/sessions/9e0a2ac2-04c9-41a2-a638-49bd04658322.jsonl*",
+        "docker compose restart openclaw-gateway"
+      ],
+      "result": "新会话正常工作"
+    },
+    {
+      "id": 3,
+      "date": "2026-03-16T22:56:00+08:00",
+      "issue": "API 余额不足",
+      "severity": "critical",
+      "symptom": "消息无响应，API 返回 402 错误",
+      "rootCause": "scnet API 账户余额不足",
+      "errorMessage": "{\"error\":{\"message\":\"Insufficient Balance\",\"type\":\"invalid_request_error\",\"code\":\"402\"}}",
+      "diagnosis": "通过 curl 直接测试 scnet API 发现余额不足错误",
+      "attemptedSolution": "尝试切换到 pucode/claude-opus-4-6 备用模型",
+      "failedAttempt": "pucode API 返回 model_not_found 错误，Claude 模型无可用通道",
+      "finalSolution": "等待 scnet 充值恢复",
+      "currentStatus": "scnet API 已恢复可用 (2026-03-17)"
+    }
+  ],
+  
+  "diagnosisCommands": {
+    "checkGatewayHealth": {
+      "command": "curl -s http://127.0.0.1:18789/health",
+      "expectedOutput": "{\"ok\":true,\"status\":\"live\"}"
+    },
+    "checkDockerStatus": {
+      "command": "cd /home/robot/agi/openclaw && docker compose ps"
+    },
+    "viewGatewayLogs": {
+      "command": "cd /home/robot/agi/openclaw && docker compose logs --tail=50 openclaw-gateway"
+    },
+    "viewGatewayLogsFiltered": {
+      "command": "cd /home/robot/agi/openclaw && docker compose logs --tail=100 openclaw-gateway 2>&1 | grep -E \"(feishu|error|Error|dispatching|received)\""
+    },
+    "testScnetAPI": {
+      "command": "curl -s -w \"\\nHTTP Time: %{time_total}s\\n\" -X POST \"https://api.scnet.cn/api/llm/v1/chat/completions\" -H \"Content-Type: application/json\" -H \"Authorization: Bearer sk-Mzc1LTExODMwMzk0NDc4LTE3NzM0NTEwMjU2MzU=\" -d '{\"model\":\"MiniMax-M2.5-ZD\",\"messages\":[{\"role\":\"user\",\"content\":\"hi\"}],\"max_tokens\":10}'"
+    },
+    "testPucodeAPI": {
+      "command": "curl -s -w \"\\nHTTP Time: %{time_total}s\\n\" -X POST \"https://api.pucode.com/v1/chat/completions\" -H \"Content-Type: application/json\" -H \"Authorization: Bearer sk-IP7MVBKIKZmBX9ft4oDsW6kCL3orM92dwU31604AILyHxHhP\" -d '{\"model\":\"claude-opus-4-6\",\"messages\":[{\"role\":\"user\",\"content\":\"hi\"}],\"max_tokens\":10}'"
+    },
+    "listSessions": {
+      "command": "docker exec openclaw-openclaw-gateway-1 ls -lt /home/node/.openclaw/agents/main/sessions/*.jsonl"
+    },
+    "viewLatestSession": {
+      "command": "docker exec openclaw-openclaw-gateway-1 tail -30 /home/node/.openclaw/agents/main/sessions/9e0a2ac2-04c9-41a2-a638-49bd04658322.jsonl"
+    },
+    "viewLogFile": {
+      "command": "docker exec openclaw-openclaw-gateway-1 cat /tmp/openclaw/openclaw-2026-03-16.log | tail -100"
+    }
+  },
+  
+  "operationCommands": {
+    "restartGateway": {
+      "command": "cd /home/robot/agi/openclaw && docker compose restart openclaw-gateway",
+      "description": "重启 gateway 服务"
+    },
+    "stopGateway": {
+      "command": "cd /home/robot/agi/openclaw && docker compose stop openclaw-gateway",
+      "description": "停止 gateway 服务"
+    },
+    "startGateway": {
+      "command": "cd /home/robot/agi/openclaw && docker compose start openclaw-gateway",
+      "description": "启动 gateway 服务"
+    },
+    "rebuildGateway": {
+      "command": "cd /home/robot/agi/openclaw && docker compose up -d --build openclaw-gateway",
+      "description": "重新构建并启动 gateway"
+    },
+    "deleteSession": {
+      "command": "docker exec openclaw-openclaw-gateway-1 rm -f /home/node/.openclaw/agents/main/sessions/<SESSION_ID>.jsonl*",
+      "description": "删除指定会话文件"
+    },
+    "clearAllSessions": {
+      "command": "docker exec openclaw-openclaw-gateway-1 rm -rf /home/node/.openclaw/agents/main/sessions/*.jsonl*",
+      "description": "清除所有会话文件（慎用）"
+    }
+  },
+  
+  "configFiles": {
+    "mainConfig": {
+      "path": "/home/robot/agi/CLAW_DATA/config/openclaw.json",
+      "description": "OpenClaw 主配置文件"
+    },
+    "extensionsDir": {
+      "path": "/home/robot/agi/CLAW_DATA/config/extensions/",
+      "description": "扩展插件目录"
+    },
+    "sessionsDir": {
+      "path": "/home/node/.openclaw/agents/main/sessions/",
+      "description": "会话文件存储目录（容器内）"
+    },
+    "sessionsIndex": {
+      "path": "/home/node/.openclaw/agents/main/sessions/sessions.json",
+      "description": "会话索引文件（容器内）"
+    },
+    "logFile": {
+      "path": "/tmp/openclaw/openclaw-2026-03-16.log",
+      "description": "Gateway 日志文件（容器内，按日期）"
+    },
+    "workspaceDir": {
+      "path": "/home/node/.openclaw/workspace/",
+      "description": "Agent 工作目录"
+    },
+    "skillsDir": {
+      "path": "/home/node/.openclaw/workspace/skills/",
+      "description": "技能目录"
+    }
+  },
+  
+  "userPreferences": {
+    "language": "zh-CN",
+    "timezone": "Asia/Shanghai (GMT+8)",
+    "role": {
+      "primary": "得力助手",
+      "secondary": "资深股票证券交易操作员",
+      "expertise": ["港股", "A股", "股票交易", "股票预测"],
+      "riskProfile": "谨慎、慎重、风险偏好适中",
+      "capabilities": ["详细解答问题", "提出有效预测策略"]
+    }
+  },
+  
+  "skills": {
+    "projectSkills": [
+      {
+        "name": "stock-data",
+        "path": "/home/robot/agi/openclaw/skills/stock-data/SKILL.md",
+        "description": "股票数据分析技能"
+      },
+      {
+        "name": "skill-discovery",
+        "path": "/home/robot/agi/openclaw/skills/skill-discovery/SKILL.md",
+        "description": "技能发现和管理"
+      }
+    ],
+    "workspaceSkills": [
+      {
+        "name": "dexter",
+        "path": "/home/robot/agi/CLAW_DATA/ws/skills/dexter/SKILL.md",
+        "description": "Dexter 技能"
+      },
+      {
+        "name": "annual-report-analyzer",
+        "path": "/home/node/.openclaw/workspace/skills/annual-report-analyzer/SKILL.md",
+        "description": "年报分析技能（开发中）",
+        "status": "TODO"
+      }
+    ]
+  },
+  
+  "stockData": {
+    "lastAnalysis": "2026-03-16T22:00:00+08:00",
+    "totalValue": "¥82,888.70",
+    "composition": {
+      "aShares": 12,
+      "hShares": 6
+    },
+    "topHoldings": [
+      { "name": "阿里巴巴-W", "code": "09988", "weight": "20.5%" },
+      { "name": "美团-W", "code": "03690", "weight": "17.6%" },
+      { "name": "三峡能源", "code": "600905", "weight": "12.5%" },
+      { "name": "上海机场", "code": "600009", "weight": "7.7%" }
+    ]
+  },
+  
+  "importantNotes": [
+    {
+      "category": "模型配置",
+      "note": "Qwen3-235B-A22B 模型配置文件中 contextWindow 写的是 128000，但实际 API 限制是 32768 tokens"
+    },
+    {
+      "category": "会话管理",
+      "note": "会话历史过长会导致 Context Overflow，需要定期清理或使用更大上下文的模型 (MiniMax-M2.5-ZD 支持 128000)"
+    },
+    {
+      "category": "备用模型",
+      "note": "pucode 的 Claude 模型当前不可用 (model_not_found)，不要尝试切换到 pucode"
+    },
+    {
+      "category": "飞书回复",
+      "note": "飞书回复模式可配置为 streaming/static/auto，当前使用默认配置"
+    },
+    {
+      "category": "插件冲突",
+      "note": "已删除外部插件 openclaw-lark，只保留内置 feishu 插件，避免工具名称冲突"
+    },
+    {
+      "category": "API 余额",
+      "note": "scnet API 曾出现余额不足 (402 Insufficient Balance)，现已恢复"
+    }
+  ],
+  
+  "conversationHistory": {
+    "startTime": "2026-03-16T22:37:00+08:00",
+    "keyTopics": [
+      "大模型选择与配置",
+      "飞书消息响应慢问题诊断",
+      "kimi-bridge 插件删除",
+      "openclaw-lark 外部插件删除",
+      "Context Overflow 问题解决",
+      "API 余额不足问题解决",
+      "模型切换与测试"
+    ],
+    "userQuestions": [
+      "当前大模型用的是哪个，选用的逻辑是怎样的",
+      "消息反馈很慢，这正常吗",
+      "把飞书的输出调整为流式输出",
+      "撤销刚才飞书流式输出的配置",
+      "删除我openclaw中kimi的相关桥接插件",
+      "把外部插件删除 openclaw-lark",
+      "agent:main:feishu:direct:ou_ab6b6751942b12c4633bba2ae78471e8 是否正常",
+      "为什么现在我的大模型调用与结果返回特别慢",
+      "检查我的openclaw的连接"
+    ]
+  }
+}
